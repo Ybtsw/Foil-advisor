@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOIL ADVISOR — Trouve ton setup idéal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--ocean:#0a1628;--deep:#060e1a;--cyan:#00d4ff;--teal:#00ffcc;--foam:#e8f4f8;--mist:#8bafc0;--accent:#ff6b35;--gold:#ffd166;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--deep);color:var(--foam);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+.ocean-bg{position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,#060e1a 0%,#0a1e35 40%,#0d2a45 100%);overflow:hidden;}
+.wave{position:absolute;bottom:0;left:-100%;width:300%;height:200px;opacity:.05;animation:waveAnim linear infinite;}
+.wave:nth-child(1){animation-duration:18s;background:radial-gradient(ellipse 200px 80px at 50% 100%,var(--cyan),transparent);}
+.wave:nth-child(2){animation-duration:24s;animation-delay:-6s;opacity:.03;background:radial-gradient(ellipse 300px 100px at 50% 100%,var(--teal),transparent);}
+.wave:nth-child(3){animation-duration:30s;animation-delay:-12s;opacity:.04;background:radial-gradient(ellipse 250px 90px at 50% 100%,var(--cyan),transparent);}
+@keyframes waveAnim{0%{transform:translateX(0)}50%{transform:translateX(20%) translateY(-20px)}100%{transform:translateX(33.33%)}}
+.particle{position:absolute;border-radius:50%;background:var(--cyan);opacity:0;animation:floatUp linear infinite;}
+@keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.4}90%{opacity:.1}100%{transform:translateY(-20px) scale(1.5);opacity:0}}
+
+/* LANG */
+.lang-bar{position:fixed;top:1rem;right:1.5rem;z-index:100;display:flex;gap:.5rem;}
+.lang-btn{font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;padding:.35rem .75rem;border:1px solid rgba(0,212,255,.2);background:rgba(6,14,26,.9);color:var(--mist);cursor:pointer;border-radius:2px;transition:all .25s;}
+.lang-btn:hover,.lang-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,212,255,.08);}
+
+.container{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 1.5rem;}
+header{position:relative;z-index:1;padding:3rem 0 2rem;text-align:center;}
+.logo-mark{display:inline-flex;align-items:center;gap:12px;margin-bottom:2rem;}
+.logo-icon{width:48px;height:48px;}
+.logo-text{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--cyan);letter-spacing:.3em;text-transform:uppercase;}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(4rem,12vw,9rem);line-height:.9;letter-spacing:-.02em;background:linear-gradient(135deg,#fff 0%,var(--cyan) 50%,var(--teal) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem;}
+.tagline{font-size:1rem;color:var(--mist);letter-spacing:.15em;text-transform:uppercase;font-weight:300;}
+
+/* WIZARD */
+.wizard{position:relative;z-index:1;padding:3rem 0 5rem;}
+.steps-nav{display:flex;justify-content:center;margin-bottom:4rem;position:relative;}
+.steps-nav::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.3;}
+.step-dot{width:40px;height:40px;border-radius:50%;border:1px solid rgba(0,212,255,.3);background:var(--ocean);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--mist);margin:0 1.5rem;position:relative;transition:all .4s;}
+.step-dot.active{border-color:var(--cyan);background:rgba(0,212,255,.1);color:var(--cyan);box-shadow:0 0 20px rgba(0,212,255,.3);}
+.step-dot.completed{border-color:var(--teal);background:rgba(0,255,204,.1);color:var(--teal);}
+.step-label{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mist);opacity:.7;}
+
+/* CARD */
+.card{background:rgba(10,22,40,.85);border:1px solid rgba(0,212,255,.12);border-radius:2px;padding:2.5rem;backdrop-filter:blur(20px);position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),var(--teal),transparent);}
+.cc{position:absolute;width:18px;height:18px;border-color:var(--cyan);border-style:solid;opacity:.35;}
+.cc.tl{top:8px;left:8px;border-width:1px 0 0 1px}.cc.tr{top:8px;right:8px;border-width:1px 1px 0 0}
+.cc.bl{bottom:8px;left:8px;border-width:0 0 1px 1px}.cc.br{bottom:8px;right:8px;border-width:0 1px 1px 0}
+
+/* PANELS */
+.step-panel{display:none;animation:fadeIn .4s ease;}
+.step-panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.step-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.05em;color:#fff;margin-bottom:.4rem;}
+.step-sub{font-size:.85rem;color:var(--mist);margin-bottom:2rem;letter-spacing:.03em;}
+
+/* FORM */
+.fields-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:1.25rem;margin-bottom:1.5rem;}
+.field{display:flex;flex-direction:column;gap:.4rem;}
+label{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);}
+input[type=number]{background:rgba(0,0,0,.45);border:1px solid rgba(0,212,255,.2);border-radius:2px;color:var(--foam);font-family:'DM Sans',sans-serif;font-size:1rem;padding:.7rem 1rem;outline:none;transition:all .3s;-webkit-appearance:none;appearance:none;}
+input[type=number]:focus{border-color:var(--cyan);background:rgba(0,212,255,.05);box-shadow:0 0 0 3px rgba(0,212,255,.08);}
+.input-hint{font-size:.7rem;color:var(--mist);opacity:.65;}
+
+/* DISC GRID */
+.disc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.85rem;margin-bottom:1.75rem;}
+@media(min-width:580px){.disc-grid{grid-template-columns:repeat(4,1fr);}}
+.disc-card{background:rgba(0,0,0,.3);border:1px solid rgba(0,212,255,.15);border-radius:2px;padding:1.25rem .85rem;cursor:pointer;text-align:center;transition:all .3s;position:relative;overflow:hidden;}
+.disc-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,212,255,.06),transparent);opacity:0;transition:.3s;}
+.disc-card:hover::after{opacity:1;}
+.disc-card.selected{border-color:var(--cyan);background:rgba(0,212,255,.08);box-shadow:0 0 18px rgba(0,212,255,.15);}
+.disc-icon{font-size:2.2rem;margin-bottom:.6rem;display:block;}
+.disc-name{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.07em;color:#fff;margin-bottom:.2rem;}
+.disc-desc{font-size:.68rem;color:var(--mist);line-height:1.4;}
+
+/* SUBDISCIPLINE SELECTOR */
+.subdisc-section{margin-bottom:1.75rem;}
+.subdisc-label{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem;display:block;}
+.subdisc-group{margin-bottom:1.25rem;padding:1.25rem;background:rgba(0,0,0,.2);border:1px solid rgba(0,212,255,.08);border-radius:2px;}
+.subdisc-sport{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.08em;color:var(--cyan);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;}
+.subdisc-pills{display:flex;flex-wrap:wrap;gap:.5rem;}
+.pill{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .85rem;border:1px solid rgba(0,212,255,.2);border-radius:20px;background:transparent;color:var(--mist);cursor:pointer;transition:all .25s;}
+.pill:hover{border-color:rgba(0,212,255,.5);color:var(--foam);}
+.pill.selected{border-color:var(--teal);background:rgba(0,255,204,.1);color:var(--teal);}
+
+/* LEVEL */
+.level-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:.85rem;margin-bottom:1.75rem;}
+.level-card{background:rgba(0,0,0,.3);border:1px solid rgba(0,212,255,.15);border-radius:2px;padding:1.1rem;cursor:pointer;transition:all .3s;}
+.level-card.selected{border-color:var(--teal);background:rgba(0,255,204,.06);box-shadow:0 0 18px rgba(0,255,204,.1);}
+.level-name{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.07em;margin-bottom:.45rem;}
+.level-bars{display:flex;gap:3px;margin-bottom:.45rem;}
+.level-bar{height:3px;flex:1;background:rgba(255,255,255,.1);border-radius:2px;transition:.3s;}
+.level-card.selected .level-bar.on{background:var(--teal);}
+.level-bar.on{background:rgba(0,212,255,.4);}
+.level-desc{font-size:.68rem;color:var(--mist);line-height:1.4;}
+
+/* BUTTONS */
+.btn{font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;padding:.85rem 2.2rem;border:none;border-radius:2px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:.4s;}
+.btn:hover::before{transform:translateX(100%);}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:var(--deep);font-weight:700;}
+.btn-primary:hover{box-shadow:0 0 28px rgba(0,212,255,.4);transform:translateY(-1px);}
+.btn-secondary{background:transparent;color:var(--mist);border:1px solid rgba(0,212,255,.2);}
+.btn-secondary:hover{border-color:rgba(0,212,255,.5);color:var(--cyan);}
+.btn-actions{display:flex;gap:.85rem;justify-content:flex-end;margin-top:1.75rem;}
+
+/* RESULTS */
+.results-header{text-align:center;margin-bottom:2.5rem;}
+.big-label{font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.3em;color:var(--teal);text-transform:uppercase;margin-bottom:.75rem;}
+.rider-summary{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:1.5rem;background:rgba(0,0,0,.3);border:1px solid rgba(0,212,255,.1);border-radius:2px;padding:.85rem 1.75rem;margin-top:.85rem;}
+.rs{text-align:center;}
+.rs-val{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cyan);}
+.rs-lbl{font-size:.62rem;color:var(--mist);letter-spacing:.1em;text-transform:uppercase;}
+
+/* RESULT BLOCK */
+.result-block{margin-bottom:3rem;border:1px solid rgba(0,212,255,.08);border-radius:2px;overflow:hidden;}
+.result-block-header{background:rgba(0,0,0,.4);padding:1.1rem 1.5rem;display:flex;align-items:center;gap:.75rem;border-bottom:1px solid rgba(0,212,255,.08);}
+.rbh-icon{font-size:1.6rem;}
+.rbh-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.08em;color:#fff;}
+.rbh-sub{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-left:auto;}
+.result-block-body{padding:1.5rem;}
+
+/* SUBDISC TAG */
+.subdisc-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;padding:.25rem .65rem;border:1px solid rgba(255,209,102,.3);color:var(--gold);border-radius:20px;margin-bottom:1.25rem;}
+
+.equip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:.85rem;margin-bottom:1.25rem;}
+.equip-item{background:rgba(0,0,0,.35);border:1px solid rgba(0,212,255,.1);border-radius:2px;padding:1.1rem 1.1rem 1.1rem 1.4rem;position:relative;}
+.equip-item::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--cyan),var(--teal));}
+.eq-lbl{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--mist);margin-bottom:.3rem;}
+.eq-val{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--cyan);line-height:1;margin-bottom:.2rem;}
+.eq-detail{font-size:.7rem;color:var(--mist);line-height:1.5;}
+.rbar-track{height:3px;background:rgba(255,255,255,.07);border-radius:2px;margin-top:.5rem;}
+.rbar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--teal));transition:width 1s ease;}
+
+.tips-wrap{margin:1rem 0;}
+.tip-box{background:rgba(255,107,53,.05);border:1px solid rgba(255,107,53,.18);border-radius:2px;padding:1rem 1.25rem 1rem 2.75rem;margin-bottom:.6rem;font-size:.82rem;line-height:1.6;position:relative;}
+.tip-box::before{content:'→';position:absolute;left:1rem;top:.95rem;color:var(--accent);font-weight:700;}
+
+/* AFFILIATES */
+.aff-wrap{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid rgba(0,255,204,.07);}
+.aff-title{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:.7rem;}
+.aff-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:.65rem;}
+.aff-card{background:rgba(0,255,204,.03);border:1px solid rgba(0,255,204,.13);border-radius:2px;padding:.9rem;text-decoration:none;transition:all .3s;display:block;}
+.aff-card:hover{border-color:var(--teal);background:rgba(0,255,204,.07);transform:translateY(-2px);box-shadow:0 4px 18px rgba(0,255,204,.1);}
+.aff-brand{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:.15rem;}
+.aff-product{font-size:.72rem;color:var(--mist);margin-bottom:.4rem;line-height:1.3;}
+.aff-price{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--teal);}
+.aff-cta{display:inline-block;margin-top:.4rem;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);border-bottom:1px solid rgba(0,212,255,.3);}
+.aff-disclaimer{font-size:.62rem;color:var(--mist);opacity:.45;margin-top:.85rem;font-style:italic;}
+
+/* COMPARATOR */
+.comp-wrap{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid rgba(255,209,102,.07);}
+.comp-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.08em;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+.comp-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(255,209,102,.25),transparent);}
+.comp-scroll{overflow-x:auto;}
+.comp-table{width:100%;border-collapse:collapse;font-size:.78rem;}
+.comp-table th{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.13em;text-transform:uppercase;color:var(--cyan);padding:.65rem .9rem;text-align:left;border-bottom:1px solid rgba(0,212,255,.13);background:rgba(0,0,0,.35);}
+.comp-table td{padding:.65rem .9rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--foam);vertical-align:middle;}
+.comp-table tr:hover td{background:rgba(0,212,255,.025);}
+.comp-table tr:last-child td{border-bottom:none;}
+.badge{display:inline-block;padding:.18rem .45rem;border-radius:2px;font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;}
+.b-best{background:rgba(0,255,204,.13);color:var(--teal);border:1px solid rgba(0,255,204,.28);}
+.b-price{background:rgba(255,209,102,.1);color:var(--gold);border:1px solid rgba(255,209,102,.2);}
+.b-perf{background:rgba(0,212,255,.1);color:var(--cyan);border:1px solid rgba(0,212,255,.2);}
+.star-r{color:var(--gold);}
+.c-link{color:var(--cyan);font-size:.68rem;text-decoration:none;font-family:'Space Mono',monospace;border-bottom:1px solid rgba(0,212,255,.28);}
+.c-link:hover{color:var(--teal);}
+
+/* MISC */
+.err{color:var(--accent);font-size:.78rem;font-family:'Space Mono',monospace;margin-top:.5rem;display:none;}
+.err.show{display:block;}
+.pline{height:1px;background:rgba(0,212,255,.1);margin:2rem 0;position:relative;overflow:hidden;}
+.pline::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scan 3s linear infinite;}
+@keyframes scan{0%{left:-100%}100%{left:100%}}
+.restart-zone{text-align:center;margin-top:2.5rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,.05);}
+
+@media(max-width:580px){
+  .card{padding:1.25rem;} h1{font-size:4.5rem;}
+  .rider-summary{gap:1rem;} .btn-actions{flex-direction:column;}
+  .step-dot{margin:0 .85rem;} .comp-table{font-size:.7rem;}
+  .comp-table th,.comp-table td{padding:.45rem .55rem;}
+}
+</style>
+</head>
+<body>
+<div class="ocean-bg"><div class="wave"></div><div class="wave"></div><div class="wave"></div></div>
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" onclick="setLang('es')">ES</button>
+</div>
+
+<div class="container">
+  <header>
+    <div class="logo-mark">
+      <svg class="logo-icon" viewBox="0 0 48 48" fill="none">
+        <path d="M8 36L24 8L40 36" stroke="#00d4ff" stroke-width="1.5" fill="none"/>
+        <path d="M16 28L32 28" stroke="#00d4ff" stroke-width="1" opacity=".5"/>
+        <circle cx="24" cy="8" r="2" fill="#00ffcc"/>
+        <path d="M24 36L24 44" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="2 2"/>
+      </svg>
+      <span class="logo-text">Foil Advisor / v2.2</span>
+    </div>
+    <h1>FOIL<br>ADVISOR</h1>
+    <p class="tagline" data-i18n="tagline">Trouve ton setup idéal en 4 étapes</p>
+    <div class="pline"></div>
+  </header>
+
+  <div class="wizard">
+    <div class="steps-nav">
+      <div class="step-dot active" id="dot-1">01<span class="step-label" data-i18n="s1l">Profil</span></div>
+      <div class="step-dot" id="dot-2">02<span class="step-label" data-i18n="s2l">Sport</span></div>
+      <div class="step-dot" id="dot-3">03<span class="step-label" data-i18n="s3l">Pratique</span></div>
+      <div class="step-dot" id="dot-4">04<span class="step-label" data-i18n="s4l">Niveau</span></div>
+      <div class="step-dot" id="dot-r">✓<span class="step-label" data-i18n="s5l">Setup</span></div>
+    </div>
+
+    <div class="card">
+      <div class="cc tl"></div><div class="cc tr"></div><div class="cc bl"></div><div class="cc br"></div>
+
+      <!-- STEP 1: PROFILE -->
+      <div class="step-panel active" id="step-1">
+        <div class="step-title" data-i18n="s1t">Ton Profil Rider</div>
+        <p class="step-sub" data-i18n="s1s">Tes mensurations calibrent les dimensions exactes</p>
+        <div class="fields-grid">
+          <div class="field"><label data-i18n="lp">Poids (kg)</label><input type="number" id="poids" placeholder="75" min="40" max="160"><span class="input-hint" data-i18n="hp">40 – 160 kg</span></div>
+          <div class="field"><label data-i18n="lt">Taille (cm)</label><input type="number" id="taille" placeholder="178" min="140" max="220"><span class="input-hint" data-i18n="ht">140 – 220 cm</span></div>
+          <div class="field"><label data-i18n="lpo">Pointure (EU)</label><input type="number" id="pointure" placeholder="42" min="35" max="50"><span class="input-hint" data-i18n="hpo">Optionnel</span></div>
+          <div class="field"><label data-i18n="lenv">Envergure bras (cm)</label><input type="number" id="envergure" placeholder="180" min="130" max="230"><span class="input-hint" data-i18n="henv">Optionnel</span></div>
+        </div>
+        <p class="err" id="err1" data-i18n="e1">⚠ Renseigne le poids et la taille pour continuer.</p>
+        <div class="btn-actions"><button class="btn btn-primary" onclick="goStep(2)" data-i18n="bn">SUIVANT →</button></div>
+      </div>
+
+      <!-- STEP 2: SPORT -->
+      <div class="step-panel" id="step-2">
+        <div class="step-title" data-i18n="s2t">Ton Sport</div>
+        <p class="step-sub" data-i18n="s2s">Sélectionne un ou plusieurs sports — nous calibrerons chaque setup</p>
+        <div class="disc-grid">
+          <div class="disc-card" data-disc="wingfoil" onclick="toggleDisc(this)"><span class="disc-icon">🪁</span><div class="disc-name">Wing Foil</div><div class="disc-desc" data-i18n="dw">Aile à main + foil. Vent 12–30 nœuds</div></div>
+          <div class="disc-card" data-disc="supfoil" onclick="toggleDisc(this)"><span class="disc-icon">🏄</span><div class="disc-name">SUP Foil</div><div class="disc-desc" data-i18n="ds">Paddle debout + foil</div></div>
+          <div class="disc-card" data-disc="surfoil" onclick="toggleDisc(this)"><span class="disc-icon">🌊</span><div class="disc-name">Surf Foil</div><div class="disc-desc" data-i18n="dsu">Prone ou surf, sur houle</div></div>
+          <div class="disc-card" data-disc="pumpfoil" onclick="toggleDisc(this)"><span class="disc-icon">⚡</span><div class="disc-name">Pump Foil</div><div class="disc-desc" data-i18n="dp">Propulsion par pompage pur</div></div>
+        </div>
+        <p class="err" id="err2" data-i18n="e2">⚠ Sélectionne au moins un sport.</p>
+        <div class="btn-actions">
+          <button class="btn btn-secondary" onclick="goStep(1)" data-i18n="bb">← RETOUR</button>
+          <button class="btn btn-primary" onclick="goStep(3)" data-i18n="bn">SUIVANT →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: SUBDISCIPLINE -->
+      <div class="step-panel" id="step-3">
+        <div class="step-title" data-i18n="s3t">Ta Pratique</div>
+        <p class="step-sub" data-i18n="s3s">Choisis une pratique par sport — le setup change radicalement selon l'objectif</p>
+        <div class="subdisc-section" id="subdisc-container"></div>
+        <p class="err" id="err3" data-i18n="e3">⚠ Choisis une pratique pour chaque sport sélectionné.</p>
+        <div class="btn-actions">
+          <button class="btn btn-secondary" onclick="goStep(2)" data-i18n="bb">← RETOUR</button>
+          <button class="btn btn-primary" onclick="goStep(4)" data-i18n="bn">SUIVANT →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: LEVEL -->
+      <div class="step-panel" id="step-4">
+        <div class="step-title" data-i18n="s4t">Ton Niveau</div>
+        <p class="step-sub" data-i18n="s4s">Sois honnête — le bon matériel accélérera ta progression</p>
+        <div class="level-grid">
+          <div class="level-card" data-level="debutant" onclick="selLevel(this)">
+            <div class="level-name" data-i18n="ld">Débutant</div>
+            <div class="level-bars"><div class="level-bar on"></div><div class="level-bar"></div><div class="level-bar"></div><div class="level-bar"></div><div class="level-bar"></div></div>
+            <div class="level-desc" data-i18n="ldd">Quelques sessions. Décollages instables.</div>
+          </div>
+          <div class="level-card" data-level="intermediaire" onclick="selLevel(this)">
+            <div class="level-name" data-i18n="li">Intermédiaire</div>
+            <div class="level-bars"><div class="level-bar on"></div><div class="level-bar on"></div><div class="level-bar on"></div><div class="level-bar"></div><div class="level-bar"></div></div>
+            <div class="level-desc" data-i18n="lid">Vol stable, premiers jibes.</div>
+          </div>
+          <div class="level-card" data-level="avance" onclick="selLevel(this)">
+            <div class="level-name" data-i18n="la">Avancé</div>
+            <div class="level-bars"><div class="level-bar on"></div><div class="level-bar on"></div><div class="level-bar on"></div><div class="level-bar on"></div><div class="level-bar"></div></div>
+            <div class="level-desc" data-i18n="lad">Jibes propres, transitions fluides.</div>
+          </div>
+          <div class="level-card" data-level="expert" onclick="selLevel(this)">
+            <div class="level-name" data-i18n="le">Expert</div>
+            <div class="level-bars"><div class="level-bar on"></div><div class="level-bar on"></div><div class="level-bar on"></div><div class="level-bar on"></div><div class="level-bar on"></div></div>
+            <div class="level-desc" data-i18n="led">Race, tricks, haute performance.</div>
+          </div>
+        </div>
+        <p class="err" id="err4" data-i18n="e4">⚠ Sélectionne ton niveau.</p>
+        <div class="btn-actions">
+          <button class="btn btn-secondary" onclick="goStep(3)" data-i18n="bb">← RETOUR</button>
+          <button class="btn btn-primary" onclick="showResults()" data-i18n="bc">CALCULER MON SETUP ⚡</button>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="step-panel" id="step-result">
+        <div class="results-header">
+          <div class="big-label" data-i18n="rl">Setup Recommandé</div>
+          <div class="step-title" data-i18n="rt">TON SETUP IDÉAL</div>
+          <div class="rider-summary" id="rider-sum"></div>
+        </div>
+        <div id="results-content"></div>
+        <div class="restart-zone"><button class="btn btn-secondary" onclick="restart()" data-i18n="br">↺ RECOMMENCER</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== TRANSLATIONS =====
+const TR={
+  fr:{tagline:'Trouve ton setup idéal en 4 étapes',s1l:'Profil',s2l:'Sport',s3l:'Pratique',s4l:'Niveau',s5l:'Setup',
+    s1t:'Ton Profil Rider',s1s:'Tes mensurations calibrent les dimensions exactes',
+    lp:'Poids (kg)',hp:'40 – 160 kg',lt:'Taille (cm)',ht:'140 – 220 cm',lpo:'Pointure (EU)',hpo:'Optionnel',lenv:'Envergure bras (cm)',henv:'Optionnel',
+    e1:'⚠ Renseigne le poids et la taille.',
+    s2t:'Ton Sport',s2s:'Sélectionne un ou plusieurs sports',
+    dw:'Aile à main + foil. Vent 12–30 nœuds',ds:'Paddle debout + foil',dsu:'Prone ou surf, sur houle',dp:'Propulsion par pompage pur',
+    e2:'⚠ Sélectionne au moins un sport.',
+    s3t:'Ta Pratique',s3s:'Choisis une pratique par sport — le setup change radicalement',
+    e3:'⚠ Choisis une pratique pour chaque sport.',
+    s4t:'Ton Niveau',s4s:'Sois honnête — le bon matériel accélérera ta progression',
+    ld:'Débutant',ldd:'Quelques sessions. Décollages instables.',
+    li:'Intermédiaire',lid:'Vol stable, premiers jibes.',
+    la:'Avancé',lad:'Jibes propres, transitions fluides.',
+    le:'Expert',led:'Race, tricks, haute performance.',
+    e4:'⚠ Sélectionne ton niveau.',
+    bn:'SUIVANT →',bb:'← RETOUR',bc:'CALCULER MON SETUP ⚡',br:'↺ RECOMMENCER',
+    rl:'Setup Recommandé',rt:'TON SETUP IDÉAL',
+    sp:'Poids',st:'Taille',si:'IMC',sn:'Niveau',
+    at:'🛒 Où acheter',acta:'Voir l\'offre →',adis:'Liens affiliés — commission perçue sans surcoût pour vous.',
+    ct:'📊 Comparateur marques',cb:'Marque',cm:'Modèle',cr:'Prix',cno:'Note',cp:'Profil',cv:'Voir',
+    bb2:'Meilleur Q/P',bp2:'Entrée gamme',bpe:'Haute perf'},
+  en:{tagline:'Find your ideal setup in 4 steps',s1l:'Profile',s2l:'Sport',s3l:'Practice',s4l:'Level',s5l:'Setup',
+    s1t:'Your Rider Profile',s1s:'Your measurements calibrate exact dimensions',
+    lp:'Weight (kg)',hp:'40 – 160 kg',lt:'Height (cm)',ht:'140 – 220 cm',lpo:'Shoe size (EU)',hpo:'Optional',lenv:'Arm span (cm)',henv:'Optional',
+    e1:'⚠ Please enter weight and height.',
+    s2t:'Your Sport',s2s:'Select one or more sports',
+    dw:'Hand wing + foil. Wind 12–30 knots',ds:'Stand-up paddle + foil',dsu:'Prone or surf, on swell',dp:'Pure pump propulsion',
+    e2:'⚠ Select at least one sport.',
+    s3t:'Your Practice',s3s:'Choose one practice per sport — setup changes radically',
+    e3:'⚠ Choose a practice for each sport.',
+    s4t:'Your Level',s4s:'Be honest — the right gear accelerates your progress',
+    ld:'Beginner',ldd:'A few sessions. Unstable takeoffs.',
+    li:'Intermediate',lid:'Stable flight, first jibes.',
+    la:'Advanced',lad:'Clean jibes, fluid transitions.',
+    le:'Expert',led:'Race, tricks, high performance.',
+    e4:'⚠ Select your level.',
+    bn:'NEXT →',bb:'← BACK',bc:'CALCULATE MY SETUP ⚡',br:'↺ START OVER',
+    rl:'Recommended Setup',rt:'YOUR IDEAL SETUP',
+    sp:'Weight',st:'Height',si:'BMI',sn:'Level',
+    at:'🛒 Where to buy',acta:'View offer →',adis:'Affiliate links — commission at no extra cost to you.',
+    ct:'📊 Brand comparator',cb:'Brand',cm:'Model',cr:'Price',cno:'Rating',cp:'Profile',cv:'View',
+    bb2:'Best value',bp2:'Entry level',bpe:'High perf'},
+  es:{tagline:'Encuentra tu setup ideal en 4 pasos',s1l:'Perfil',s2l:'Deporte',s3l:'Práctica',s4l:'Nivel',s5l:'Setup',
+    s1t:'Tu Perfil de Rider',s1s:'Tus medidas calibran las dimensiones exactas',
+    lp:'Peso (kg)',hp:'40 – 160 kg',lt:'Altura (cm)',ht:'140 – 220 cm',lpo:'Talla zapato (EU)',hpo:'Opcional',lenv:'Envergadura (cm)',henv:'Opcional',
+    e1:'⚠ Indica tu peso y altura.',
+    s2t:'Tu Deporte',s2s:'Selecciona uno o varios deportes',
+    dw:'Ala de mano + foil. Viento 12–30 nudos',ds:'Paddle de pie + foil',dsu:'Prone o surf, en ola',dp:'Propulsión pura por bombeo',
+    e2:'⚠ Selecciona al menos un deporte.',
+    s3t:'Tu Práctica',s3s:'Elige una práctica por deporte — el setup cambia radicalmente',
+    e3:'⚠ Elige una práctica para cada deporte.',
+    s4t:'Tu Nivel',s4s:'Sé honesto — el material adecuado acelera tu progresión',
+    ld:'Principiante',ldd:'Pocas sesiones. Despegues inestables.',
+    li:'Intermedio',lid:'Vuelo estable, primeros jibes.',
+    la:'Avanzado',lad:'Jibes limpios, transiciones fluidas.',
+    le:'Experto',led:'Race, tricks, alto rendimiento.',
+    e4:'⚠ Selecciona tu nivel.',
+    bn:'SIGUIENTE →',bb:'← ATRÁS',bc:'CALCULAR MI SETUP ⚡',br:'↺ EMPEZAR DE NUEVO',
+    rl:'Setup Recomendado',rt:'TU SETUP IDEAL',
+    sp:'Peso',st:'Altura',si:'IMC',sn:'Nivel',
+    at:'🛒 Dónde comprar',acta:'Ver oferta →',adis:'Enlaces afiliados — comisión sin coste adicional.',
+    ct:'📊 Comparador marcas',cb:'Marca',cm:'Modelo',cr:'Precio',cno:'Nota',cp:'Perfil',cv:'Ver',
+    bb2:'Mejor Q/P',bp2:'Gama entrada',bpe:'Alto rend.'},
+};
+
+// Subdiscipline definitions per sport
+const SUBDISCS={
+  wingfoil:[
+    {id:'freeride',  icon:'🌊', fr:'Freeride',        en:'Freeride',       es:'Freeride',       fdesc:{fr:'Navigation plaisir, polyvalent',en:'Leisure riding, versatile',es:'Navegación placer'}},
+    {id:'race',      icon:'🏁', fr:'Race / Downwind',  en:'Race / Downwind',es:'Race / Downwind', fdesc:{fr:'Vitesse, gybe rapide, compétition',en:'Speed, fast gybe, competition',es:'Velocidad, competición'}},
+    {id:'freestyle', icon:'🔄', fr:'Freestyle / Tricks',en:'Freestyle / Tricks',es:'Freestyle / Trucos',fdesc:{fr:'Sauts, loops, tricks aériens',en:'Jumps, loops, aerial tricks',es:'Saltos, loops, trucos aéreos'}},
+    {id:'surf',      icon:'🏄', fr:'Surf / Vagues',    en:'Surf / Waves',   es:'Surf / Olas',     fdesc:{fr:'Riding sur houle, petites vagues',en:'Riding swell and small waves',es:'Surf en ola'}},
+    {id:'pump',      icon:'⚡', fr:'Pump / Cruising',  en:'Pump / Cruising',es:'Pump / Crucero',  fdesc:{fr:'Économie d\'énergie, glisse longue',en:'Energy saving, long glide',es:'Ahorro energía, planeo largo'}},
+  ],
+  supfoil:[
+    {id:'downwind',  icon:'💨', fr:'Downwind / Race',  en:'Downwind / Race',es:'Downwind / Race',  fdesc:{fr:'Bumps, distance, compétition',en:'Bumps, distance, competition',es:'Bumps, distancia, competición'}},
+    {id:'surf',      icon:'🌊', fr:'Surf / Vagues',    en:'Surf / Waves',   es:'Surf / Olas',      fdesc:{fr:'Small waves, sections molles',en:'Small waves, soft sections',es:'Olas pequeñas, secciones suaves'}},
+    {id:'freeride',  icon:'🎯', fr:'Freeride / Pump',  en:'Freeride / Pump',es:'Freeride / Pump',  fdesc:{fr:'Navigation libre, eau plate',en:'Free riding, flat water',es:'Navegación libre, agua plana'}},
+  ],
+  surfoil:[
+    {id:'prone',     icon:'🤽', fr:'Prone / Bodyboard',en:'Prone / Bodyboard',es:'Prone / Bodyboard',fdesc:{fr:'Rame à plat ventre, houle pure',en:'Flat belly paddle, pure swell',es:'Remo tumbado, ola pura'}},
+    {id:'surf',      icon:'🏄', fr:'Surf Foil classique',en:'Classic Surf Foil',es:'Surf Foil clásico',fdesc:{fr:'Board debout, vagues courtes',en:'Standing board, short waves',es:'Tabla de pie, olas cortas'}},
+    {id:'tow',       icon:'🚤', fr:'Tow-in',           en:'Tow-in',         es:'Tow-in',           fdesc:{fr:'Remorqué par jet, grosses houles',en:'Tow by jet ski, big swells',es:'Remolcado, olas grandes'}},
+  ],
+  pumpfoil:[
+    {id:'flatwater', icon:'🏊', fr:'Eau plate / Distance',en:'Flat water / Distance',es:'Agua plana / Distancia',fdesc:{fr:'Sessions longues, record de distance',en:'Long sessions, distance records',es:'Sesiones largas, récord distancia'}},
+    {id:'downwind',  icon:'💨', fr:'Downwind / Mer',   en:'Downwind / Sea', es:'Downwind / Mar',   fdesc:{fr:'Pompe sur bumps de vent',en:'Pump on wind bumps',es:'Bombeo en bumps de viento'}},
+    {id:'fitness',   icon:'💪', fr:'Fitness / Training',en:'Fitness / Training',es:'Fitness / Entrenamiento',fdesc:{fr:'Entraînement physique, technique',en:'Physical training, technique',es:'Entrenamiento físico, técnica'}},
+  ],
+};
+
+let lang=(navigator.language||'fr').slice(0,2);
+if(!TR[lang])lang='fr';
+function t(k){return TR[lang][k]||TR.fr[k]||k;}
+
+function setLang(l){
+  lang=l;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const v=TR[l][el.dataset.i18n];if(v)el.textContent=v;});
+  buildSubdiscUI(); // rebuild with new language
+}
+
+// ===== STATE =====
+let S={poids:0,taille:0,pointure:0,envergure:0,disciplines:[],subdiscs:{},niveau:''};
+
+// Particles
+(()=>{const bg=document.querySelector('.ocean-bg');for(let i=0;i<15;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*3+1;p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${Math.random()*15+10}s;animation-delay:${Math.random()*15}s;`;bg.appendChild(p);}})();
+
+// ===== NAV =====
+function goStep(n){
+  if(n===2){
+    const p=parseFloat(document.getElementById('poids').value);
+    const tt=parseFloat(document.getElementById('taille').value);
+    if(!p||!tt||p<40||p>160||tt<140||tt>220){document.getElementById('err1').classList.add('show');return;}
+    document.getElementById('err1').classList.remove('show');
+    S.poids=p;S.taille=tt;
+    S.pointure=parseFloat(document.getElementById('pointure').value)||0;
+    S.envergure=parseFloat(document.getElementById('envergure').value)||Math.round(tt*1.02);
+  }
+  if(n===3){
+    if(!S.disciplines.length){document.getElementById('err2').classList.add('show');return;}
+    document.getElementById('err2').classList.remove('show');
+    buildSubdiscUI();
+  }
+  if(n===4){
+    // Check all selected sports have a subdiscipline chosen
+    const missing=S.disciplines.some(d=>!S.subdiscs[d]);
+    if(missing){document.getElementById('err3').classList.add('show');return;}
+    document.getElementById('err3').classList.remove('show');
+  }
+  setActive(n);
+}
+
+function setActive(n){
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.step-dot').forEach(d=>d.classList.remove('active'));
+  const steps=[1,2,3,4];
+  if(n==='result'){
+    document.getElementById('step-result').classList.add('active');
+    document.getElementById('dot-r').classList.add('active');
+    steps.forEach(i=>document.getElementById(`dot-${i}`).classList.add('completed'));
+  } else {
+    document.getElementById(`step-${n}`).classList.add('active');
+    document.getElementById(`dot-${n}`).classList.add('active');
+    for(let i=1;i<n;i++)document.getElementById(`dot-${i}`).classList.add('completed');
+  }
+}
+
+function toggleDisc(el){
+  const d=el.dataset.disc;
+  el.classList.toggle('selected');
+  if(S.disciplines.includes(d)){
+    S.disciplines=S.disciplines.filter(x=>x!==d);
+    delete S.subdiscs[d];
+  } else {
+    S.disciplines.push(d);
+  }
+}
+
+function buildSubdiscUI(){
+  const container=document.getElementById('subdisc-container');
+  const sportNames={wingfoil:'🪁 Wing Foil',supfoil:'🏄 SUP Foil',surfoil:'🌊 Surf Foil',pumpfoil:'⚡ Pump Foil'};
+  let html='';
+  S.disciplines.forEach(disc=>{
+    const opts=SUBDISCS[disc]||[];
+    html+=`<div class="subdisc-group"><div class="subdisc-sport">${sportNames[disc]}</div><div class="subdisc-pills">`;
+    opts.forEach(opt=>{
+      const active=S.subdiscs[disc]===opt.id?'selected':'';
+      const label=opt[lang]||opt.fr;
+      const desc=opt.fdesc[lang]||opt.fdesc.fr;
+      html+=`<button class="pill ${active}" data-disc="${disc}" data-sub="${opt.id}" onclick="selSub(this)" title="${desc}">${opt.icon} ${label}</button>`;
+    });
+    html+=`</div></div>`;
+  });
+  container.innerHTML=html;
+}
+
+function selSub(el){
+  const disc=el.dataset.disc;
+  const sub=el.dataset.sub;
+  document.querySelectorAll(`.pill[data-disc="${disc}"]`).forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  S.subdiscs[disc]=sub;
+}
+
+function selLevel(el){
+  document.querySelectorAll('.level-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  S.niveau=el.dataset.level;
+}
+
+// ===== CALCULATION ENGINE (corrected terrain values) =====
+// WING FOIL — Values calibrated: 80kg avancé freeride = ~64L board, 870cm² foil, 4.5m² wing
+function calcWingfoil(subdisc){
+  const{poids,taille,niveau}=S;
+
+  // ---- BOARD VOLUME (ratio method, corrected) ----
+  const volRatio={
+    freeride: {debutant:1.25,intermediaire:0.95,avance:0.75,expert:0.60},
+    race:     {debutant:1.10,intermediaire:0.85,avance:0.65,expert:0.50},
+    freestyle:{debutant:1.30,intermediaire:1.00,avance:0.80,expert:0.65},
+    surf:     {debutant:1.20,intermediaire:0.90,avance:0.70,expert:0.55},
+    pump:     {debutant:1.15,intermediaire:0.90,avance:0.72,expert:0.58},
+  };
+  const bvol=Math.round(poids*(volRatio[subdisc]||volRatio.freeride)[niveau]);
+
+  // ---- FOIL SURFACE (cm²) — CORRECTED terrain values ----
+  // Base for 75kg: deb=1400, inter=1100, avancé=870, expert=680
+  // +/- 6cm² per kg delta from 75kg
+  const foilBase={
+    freeride: {debutant:1400,intermediaire:1100,avance:870,expert:680},
+    race:     {debutant:1300,intermediaire:1000,avance:800,expert:620},
+    freestyle:{debutant:1500,intermediaire:1200,avance:950,expert:750},
+    surf:     {debutant:1450,intermediaire:1150,avance:920,expert:720},
+    pump:     {debutant:1600,intermediaire:1300,avance:1050,expert:820},
+  };
+  const fb=(foilBase[subdisc]||foilBase.freeride)[niveau];
+  let foil=Math.round(fb+(poids-75)*6);
+  foil=Math.max(550,Math.min(1800,foil));
+
+  // ---- FOIL ASPECT RATIO ----
+  const arMap={
+    race:    {debutant:'7–9',intermediaire:'9–11',avance:'11–14',expert:'14–17'},
+    freestyle:{debutant:'4–6',intermediaire:'5–7',avance:'6–8',expert:'7–9'},
+    pump:    {debutant:'6–8',intermediaire:'8–11',avance:'11–14',expert:'14–18'},
+    freeride:{debutant:'5–7',intermediaire:'6–8',avance:'7–10',expert:'9–12'},
+    surf:    {debutant:'4–6',intermediaire:'5–7',avance:'6–8',expert:'7–9'},
+  };
+  const ar=(arMap[subdisc]||arMap.freeride)[niveau];
+
+  // ---- WING SIZE (m²) — CORRECTED: 80kg/15-20kts = 4–5m² ----
+  // Base at 75kg. +0.3m² per 10kg, wind ref 15-20kts
+  // Adjust per subdisc: race smaller, freestyle/surf smaller, freeride standard, pump larger
+  const wingBase={
+    freeride: {debutant:[5,7],   intermediaire:[4,6],   avance:[3.5,5], expert:[3,4.5]},
+    race:     {debutant:[4,5.5], intermediaire:[3.5,5], avance:[3,4.5], expert:[2.5,4]},
+    freestyle:{debutant:[4.5,6], intermediaire:[4,5.5], avance:[3,4.5], expert:[2.5,4]},
+    surf:     {debutant:[4.5,6], intermediaire:[3.5,5], avance:[3,4.5], expert:[2.5,4]},
+    pump:     {debutant:[5,7],   intermediaire:[4.5,6], avance:[4,5.5], expert:[3.5,5]},
+  };
+  const[wmin,wmax]=(wingBase[subdisc]||wingBase.freeride)[niveau];
+  // Weight adjustment: +0.5 if >85kg, -0.3 if <65kg
+  const wadj=poids>85?0.5:poids<65?-0.3:0;
+  const wing=`${+(wmin+wadj).toFixed(1)}–${+(wmax+wadj).toFixed(1)}`;
+
+  // ---- MAST LENGTH ----
+  const mastMap={
+    freeride: {debutant:65,intermediaire:75,avance:85,expert:90},
+    race:     {debutant:70,intermediaire:80,avance:90,expert:95},
+    freestyle:{debutant:60,intermediaire:70,avance:75,expert:80},
+    surf:     {debutant:60,intermediaire:70,avance:80,expert:85},
+    pump:     {debutant:70,intermediaire:80,avance:90,expert:95},
+  };
+  const mast=(mastMap[subdisc]||mastMap.freeride)[niveau];
+
+  // ---- FUSELAGE LENGTH ----
+  const fuseMap={
+    race:    {debutant:80,intermediaire:75,avance:68,expert:60},
+    freestyle:{debutant:75,intermediaire:65,avance:55,expert:48},
+    surf:    {debutant:78,intermediaire:68,avance:58,expert:50},
+    freeride:{debutant:80,intermediaire:72,avance:65,expert:58},
+    pump:    {debutant:85,intermediaire:80,avance:75,expert:70},
+  };
+  const fuse=(fuseMap[subdisc]||fuseMap.freeride)[niveau];
+
+  const subdiscLabels={freeride:'Freeride',race:'Race / Downwind',freestyle:'Freestyle',surf:'Surf / Vagues',pump:'Pump / Cruising'};
+  return{
+    title:'Wing Foil',icon:'🪁',subdiscLabel:subdiscLabels[subdisc]||subdisc,
+    items:[
+      {l:'Volume Board',v:`${bvol} L`,d:`Rapport ${((bvol/poids)*100).toFixed(0)}% du poids. ${subdisc==='race'?'Board étroit, planing rapide.':subdisc==='freestyle'?'Volume pour poppers et airs.':'Polyvalence foil/planing.'}`,p:Math.min(100,(bvol/160)*100)},
+      {l:'Taille Wing',v:`${wing} m²`,d:`Pour 15–20 nœuds à ${poids}kg. ${subdisc==='race'?'Petit = vitesse, jibe rapide.':subdisc==='pump'?'Grand = portance longue durée.':'Ajuste +1m² sous 12 nœuds.'}`,p:65},
+      {l:'Surface Foil',v:`${foil} cm²`,d:`${foil<800?'Foil haute vitesse, décollage rapide.':foil<1100?'Foil polyvalent, bon compromis.':'Foil portant, décollage facile.'} AR ${ar}.`,p:Math.min(100,(foil/1800)*100)},
+      {l:'Longueur Mât',v:`${mast} cm`,d:`${mast<=65?'Court = stabilité, surf.':mast<=80?'Standard polyvalent.':'Long = ride propre, race.'}`,p:(mast/95)*100},
+      {l:'Fuselage',v:`${fuse} cm`,d:`${fuse<60?'Court = réactivité, tricks.':fuse<70?'Équilibré.':'Long = stabilité, pompe.'}`,p:(fuse/90)*100},
+    ],
+    tips:getTips('wingfoil',subdisc,niveau,poids),
+    aff:getAff('wingfoil',subdisc,niveau),
+    comp:getComp('wingfoil',subdisc),
+  };
+}
+
+// SUP FOIL — calibrated values
+function calcSupfoil(subdisc){
+  const{poids,taille,niveau}=S;
+  const volR={downwind:{debutant:1.7,intermediaire:1.3,avance:1.0,expert:0.82},surf:{debutant:1.6,intermediaire:1.2,avance:0.95,expert:0.75},freeride:{debutant:1.8,intermediaire:1.4,avance:1.1,expert:0.88}};
+  const bvol=Math.round(poids*(volR[subdisc]||volR.freeride)[niveau]);
+  const lensMap={downwind:{debutant:[9,10.5],intermediaire:[8,9.5],avance:[7,8.5],expert:[6,7.5]},surf:{debutant:[8,9.5],intermediaire:[7,8.5],avance:[6,7.5],expert:[5.5,6.5]},freeride:{debutant:[9.5,11],intermediaire:[8,10],avance:[7,8.5],expert:[6,7.5]}};
+  const[ll,lh]=(lensMap[subdisc]||lensMap.freeride)[niveau];
+  const boardLen=poids>85?`${ll+0.5}'–${lh+0.5}'`:`${ll}'–${lh}'`;
+  const foilBase={downwind:{debutant:1600,intermediaire:1300,avance:1050,expert:820},surf:{debutant:1700,intermediaire:1400,avance:1100,expert:850},freeride:{debutant:1800,intermediaire:1450,avance:1150,expert:900}};
+  let foil=Math.round((foilBase[subdisc]||foilBase.freeride)[niveau]+(poids-75)*7);
+  foil=Math.max(700,Math.min(2200,foil));
+  const arMap={downwind:{debutant:'6–8',intermediaire:'8–10',avance:'10–13',expert:'13–16'},surf:{debutant:'4–6',intermediaire:'5–7',avance:'6–8',expert:'7–10'},freeride:{debutant:'5–7',intermediaire:'7–9',avance:'9–12',expert:'11–14'}};
+  const ar=(arMap[subdisc]||arMap.freeride)[niveau];
+  const masts={debutant:65,intermediaire:75,avance:85,expert:90};
+  const paddleLen=Math.round(taille*(niveau==='debutant'?1.18:1.14));
+  const subdiscLabels={downwind:'Downwind / Race',surf:'Surf / Vagues',freeride:'Freeride / Pump'};
+  return{
+    title:'SUP Foil',icon:'🏄',subdiscLabel:subdiscLabels[subdisc]||subdisc,
+    items:[
+      {l:'Volume Board',v:`${bvol} L`,d:`Longueur ≈ ${boardLen}.`,p:Math.min(100,(bvol/280)*100)},
+      {l:'Surface Foil',v:`${foil} cm²`,d:`AR recommandé ${ar}.`,p:Math.min(100,(foil/2200)*100)},
+      {l:'Aspect Ratio',v:ar,d:subdisc==='downwind'?'AR élevé = glisse sur les bumps.':subdisc==='surf'?'AR modéré = maniabilité en vague.':'Compromis portance/vitesse.',p:65},
+      {l:'Longueur Mât',v:`${masts[niveau]} cm`,d:niveau==='debutant'?'Court = stabilité.':'Long = ride plus propre.',p:(masts[niveau]/90)*100},
+      {l:'Paddle',v:`${paddleLen} cm`,d:`Taille + ${paddleLen-taille} cm.`,p:72},
+    ],
+    tips:getTips('supfoil',subdisc,niveau,poids),aff:getAff('supfoil',subdisc,niveau),comp:getComp('supfoil',subdisc),
+  };
+}
+
+// SURF FOIL — calibrated
+function calcSurfoil(subdisc){
+  const{poids,niveau}=S;
+  const volR={prone:{debutant:1.5,intermediaire:1.15,avance:0.88,expert:0.68},surf:{debutant:1.6,intermediaire:1.2,avance:0.90,expert:0.70},tow:{debutant:1.2,intermediaire:0.95,avance:0.75,expert:0.58}};
+  const bvol=Math.round(poids*(volR[subdisc]||volR.surf)[niveau]);
+  const foilBase={prone:{debutant:1500,intermediaire:1200,avance:950,expert:750},surf:{debutant:1600,intermediaire:1280,avance:1000,expert:780},tow:{debutant:1200,intermediaire:980,avance:780,expert:620}};
+  let foil=Math.round((foilBase[subdisc]||foilBase.surf)[niveau]+(poids-75)*6);
+  foil=Math.max(500,Math.min(1800,foil));
+  const arMap={prone:{debutant:'4–6',intermediaire:'6–8',avance:'8–11',expert:'11–14'},surf:{debutant:'4–6',intermediaire:'5–7',avance:'7–9',expert:'9–12'},tow:{debutant:'5–7',intermediaire:'7–9',avance:'9–12',expert:'12–15'}};
+  const ar=(arMap[subdisc]||arMap.surf)[niveau];
+  const mastMap={prone:{debutant:60,intermediaire:72,avance:83,expert:90},surf:{debutant:60,intermediaire:70,avance:80,expert:88},tow:{debutant:65,intermediaire:75,avance:85,expert:92}};
+  const mast=(mastMap[subdisc]||mastMap.surf)[niveau];
+  const stabMap={debutant:'420–520',intermediaire:'320–420',avance:'220–320',expert:'155–240'};
+  const subdiscLabels={prone:'Prone / Bodyboard',surf:'Surf Foil classique',tow:'Tow-in'};
+  return{
+    title:'Surf Foil',icon:'🌊',subdiscLabel:subdiscLabels[subdisc]||subdisc,
+    items:[
+      {l:'Volume Board',v:`${bvol} L`,d:subdisc==='tow'?'Board ultra-court pour tow.':subdisc==='prone'?'Paddle couché facilité.':'Décollage sur la section.',p:Math.min(100,(bvol/230)*100)},
+      {l:'Surface Foil',v:`${foil} cm²`,d:`AR ${ar}. ${foil<900?'Haute vitesse.':foil<1200?'Polyvalent.':'Portant, énergie faible.'}`,p:Math.min(100,(foil/1800)*100)},
+      {l:'Aspect Ratio',v:ar,d:subdisc==='prone'?'AR élevé = distance sur la houle.':subdisc==='tow'?'AR très élevé = vitesse max.':'Équilibre maniabilité/glisse.',p:65},
+      {l:'Longueur Mât',v:`${mast} cm`,d:`Adapté ${subdisc==='surf'?'au break':'à la houle'}.`,p:(mast/92)*100},
+      {l:'Stab (arrière)',v:`${stabMap[niveau]} cm²`,d:'Contrôle du pitch.',p:60},
+    ],
+    tips:getTips('surfoil',subdisc,niveau,poids),aff:getAff('surfoil',subdisc,niveau),comp:getComp('surfoil',subdisc),
+  };
+}
+
+// PUMP FOIL — calibrated
+function calcPumpfoil(subdisc){
+  const{poids,niveau}=S;
+  const volR={flatwater:{debutant:1.05,intermediaire:0.85,avance:0.68,expert:0.52},downwind:{debutant:1.1,intermediaire:0.88,avance:0.70,expert:0.55},fitness:{debutant:1.15,intermediaire:0.92,avance:0.73,expert:0.58}};
+  const bvol=Math.round(poids*(volR[subdisc]||volR.flatwater)[niveau]);
+  const foilBase={flatwater:{debutant:1700,intermediaire:1380,avance:1100,expert:860},downwind:{debutant:1600,intermediaire:1280,avance:1020,expert:800},fitness:{debutant:1750,intermediaire:1420,avance:1130,expert:880}};
+  let foil=Math.round((foilBase[subdisc]||foilBase.flatwater)[niveau]+(poids-75)*7);
+  foil=Math.max(700,Math.min(2000,foil));
+  const arMap={flatwater:{debutant:'6–8',intermediaire:'8–11',avance:'11–15',expert:'14–18'},downwind:{debutant:'7–9',intermediaire:'9–12',avance:'12–15',expert:'14–18'},fitness:{debutant:'5–7',intermediaire:'7–10',avance:'9–13',expert:'12–16'}};
+  const ar=(arMap[subdisc]||arMap.flatwater)[niveau];
+  const mastMap={debutant:72,intermediaire:82,avance:90,expert:95};
+  const subdiscLabels={flatwater:'Eau plate / Distance',downwind:'Downwind / Mer',fitness:'Fitness / Training'};
+  return{
+    title:'Pump Foil',icon:'⚡',subdiscLabel:subdiscLabels[subdisc]||subdisc,
+    items:[
+      {l:'Volume Board',v:`${bvol} L`,d:subdisc==='fitness'?'Board stable pour répétitions.':'Board compact, poids minimal.',p:Math.min(100,(bvol/180)*100)},
+      {l:'Surface Foil',v:`${foil} cm²`,d:`Grande surface = pompage efficace à basse cadence.`,p:Math.min(100,(foil/2000)*100)},
+      {l:'Aspect Ratio',v:ar,d:`${subdisc==='flatwater'?'AR très élevé = glisse longue entre les pompes.':subdisc==='downwind'?'AR élevé + grande envergure = surf sur bumps.':'AR modéré pour l\'apprentissage technique.'}`,p:72},
+      {l:'Longueur Mât',v:`${mastMap[niveau]} cm`,d:'Long = oscillations amorties.',p:(mastMap[niveau]/95)*100},
+    ],
+    tips:getTips('pumpfoil',subdisc,niveau,poids),aff:getAff('pumpfoil',subdisc,niveau),comp:getComp('pumpfoil',subdisc),
+  };
+}
+
+// ===== TIPS =====
+function getTips(sport,sub,niv,poids){
+  const T={
+    wingfoil:{
+      freeride:{debutant:["Board > 25L de plus que ton poids pour rester stable lors des chutes.","Commence sur des plans d'eau calmes et du vent régulier 15–20 nœuds.","Un foil 1200–1400cm² te fera décoller très tôt — priorité en apprentissage."],intermediaire:["Travaille le jibe en gardant la wing basse pour réduire la traînée.","Un foil 1000–1200cm² est le sweet spot progression/polyvalence.","Essaie de varier les tailles de wing pour comprendre la plage de vent."],avance:["Un foil 800–950cm² te donnera de la vitesse sans sacrifier le décollage.","Travaille les transitions rapides (tack sans touchée).","Régle la position du mât de foil : +1cm arrière = plus de stabilité."],expert:["Foil < 750cm² AR > 12 pour les sessions racing et vitesse.","La position du centre de gravité au-dessus du mât est critique : chaque mm compte.","Teste différents stabilisateurs pour affiner le comportement en gybe."]},
+      race:{debutant:["Commence par maîtriser le jibe avant de chercher la vitesse.","Un foil 1100–1300cm² te permettra de rester en l'air longtemps.","La posture basse sur le board réduit la résistance au vent."],intermediaire:["Le pied arrière contrôle l'altitude — travaille le trim en permanence.","En race, la gestion du vent apparent est clé : pompe la wing en bord de vent.","Un mât de 80cm+ réduit les perturbations de surface."],avance:["Foil 750–900cm² AR 11–14 pour le meilleur ratio vitesse/décollage.","Le gybe en foil doit être exécuté en conservant le vol — travaille ça en priorité.","Optimise ton point de régate : bord de vent maximum au portant."],expert:["AR 14–17 = vitesse maximale, mais exige un contrôle parfait du trim.","Les foils race (Axis 650, Armstrong MA 775) sont le standard compétition.","Analyse ta VMG (Velocity Made Good) pour optimiser les allures."]},
+      freestyle:{debutant:["Priorité à la stabilité avant les tricks — maîtrise le vol plat.","Un board avec volume aide à relancer après les chutes.","Les premiers tricks : willy skipper (wing passée sous le corps)."],intermediaire:["Le somersault et le backroll nécessitent un foil court et manœuvrant.","Un fuselage court (55–65cm) rend le foil bien plus réactif.","Travaille le pop : compression genou + propulsion explosive."],avance:["Fuselage < 55cm + foil 900–1000cm² = configuration tricks optimale.","Les loops nécessitent un foil qui pivote vite — AR modéré 6–8.","Vidéo tes sessions : l'analyse est indispensable pour les sauts."],expert:["Les meilleurs freestylers utilisent des setups très courts et légers (< 5kg).","La maîtrise du toeside permet d'accéder aux tricks les plus avancés.","Expérimente les ailes asymétriques pour plus de dynamisme."]},
+      surf:{debutant:["Commence sur des sections longues et régulières — pas de shore break.","Un foil large (1300cm²+) capte même les sections sans énergie.","Monte le foil en arrière du board pour faciliter le décollage."],intermediaire:["Le bottom turn en foil est le geste le plus important — travaille-le d'abord.","En vague faible, une wing petite génère moins de résistance.","Travaille à surfer sans la wing pour améliorer le trim."],avance:["Les sections courtes et creuses sont accessibles avec un foil 800–1000cm².","Combine wing et energie de la vague pour des rides interminables.","AR 6–8 pour maniabilité maximale dans les sections."],expert:["Le surf foil pur (sans wing) s'apprend grâce à la maîtrise du trim.","Foil < 750cm² pour exploiter les vagues avec énergie.","Les jibes en vague sont le standard expert — aucune touchée permise."]},
+      pump:{debutant:["L'objectif est de maintenir l'altitude entre les rafales.","Un foil 1400cm²+ te permettra de pomper sans tomber.","Cadence régulière 35–50 pompes/min — priorité sur la force."],intermediaire:["Alterne pompe active et plané passif pour économiser l'énergie.","Un mât de 85cm+ lisse les perturbations de surface.","Travaille le 'glide mode' : foil haut, corps relâché."],avance:["Foil 950–1100cm² AR 10+ = le meilleur ratio distance/énergie.","Le pump downwind te permettra de linker des sessions très longues.","Corps en position aérodynamique = moins de résistance = plus de distance."],expert:["Setup ultra-léger (board < 4kg, foil < 3kg) pour les records.","AR 14+ avec très grande envergure = glisses de 8–15 secondes entre pompes.","Analyse GPS pour mesurer distance/énergie et optimiser la technique."]},
+    },
+    supfoil:{
+      downwind:[
+        "Sessions idéales : fetch de 10km minimum, vent 15+ nœuds.",
+        "L'objectif est de rester en vol en connectant les bumps — travaille le 'step down'.",
+        "Un foil à grande envergure (AR 10+) est indispensable pour connecter les bumps.",
+      ],
+      surf:[
+        "Les spot de point break offrent les meilleures sections pour progresser.",
+        "Pied avant léger = plus de portance, pied arrière appuyé = freinage/descente.",
+        "Commence par des vagues molles de 0.5–1m : prévisibles et longues.",
+      ],
+      freeride:[
+        "L'eau plate est idéale pour travailler le 'pump to fly' et la technique de base.",
+        "Un board large (> 26\") offre une grande stabilité lors des premiers décollages.",
+        "Marque tes positions de pieds avec du tape pour reproduire le placement optimal.",
+      ],
+    },
+    surfoil:{
+      prone:[
+        "La rame à plat ventre demande un board large et epais pour la flottabilité.",
+        "Travaille le timing de décollage : debout juste quand le foil monte.",
+        "Les séries de houle longue période (12s+) sont les meilleures conditions.",
+      ],
+      surf:[
+        "Évite les spots bondés — le foil est dangereux pour les autres usagers.",
+        "Un leash cheville renforcé est obligatoire — jamais de leash court.",
+        "Commence en shore break léger ou en petite houle sans courant.",
+      ],
+      tow:[
+        "Le tow-in nécessite une combinaison + casque + gilet d'impact obligatoires.",
+        "La vitesse de remorquage idéale est 25–35 km/h selon le foil.",
+        "Communication claire avec le conducteur du jet ski avant chaque run.",
+      ],
+    },
+    pumpfoil:{
+      flatwater:[
+        "Eau plate obligatoire — la mer plate du matin est la condition idéale.",
+        "Fréquence > force : vise 45–60 pompes/min régulières.",
+        "Un fuselage long (80cm+) rend le comportement très prévisible pour débuter.",
+      ],
+      downwind:[
+        "Lis les bumps à l'avance — anticipe de 3–4 seconds pour te positionner.",
+        "Le downwind pump combine pompe active et surf passif des bumps de vent.",
+        "Commence par des fetches courts (3–5km) avant d'attaquer les longues distances.",
+      ],
+      fitness:[
+        "Le pump foil est un exercice cardio intense — 30min = ~800 calories.",
+        "Travaille les intervalles : 2min de pompe intense, 30s de plané.",
+        "Le gainage lombaire est clé — intègre des exercices de core hors de l'eau.",
+      ],
+    },
+  };
+  return T[sport]&&T[sport][sub]?T[sport][sub]:T[sport]?Object.values(T[sport])[0]:[];
+}
+
+// ===== AFFILIATES =====
+function getAff(sport,sub,niv){
+  const D={
+    wingfoil:{
+      freeride:{debutant:[{b:'F-One',p:'Swing V3 5m²',pr:'~699€',u:'https://f-one.world'},{b:'Duotone',p:'Echo 6m²',pr:'~750€',u:'https://duotonesports.com'},{b:'Decathlon',p:'Pack Itiwit Wing',pr:'~490€',u:'https://decathlon.fr'}],intermediaire:[{b:'Cabrinha',p:'Crosswing X 4m²',pr:'~899€',u:'https://cabrinha.com'},{b:'F-One',p:'Strike CWC 4m²',pr:'~950€',u:'https://f-one.world'},{b:'Slingshot',p:'Slingwing V4 4m²',pr:'~820€',u:'https://slingshotsports.com'}],avance:[{b:'Duotone',p:'Unit D/LAB 3.5m²',pr:'~1 190€',u:'https://duotonesports.com'},{b:'F-One',p:'Strike CWC 3m²',pr:'~980€',u:'https://f-one.world'},{b:'Axis',p:'Foil MA 925 + mât',pr:'~1 100€',u:'https://axisfoils.com'}],expert:[{b:'Duotone',p:'Unit D/LAB 2.5m²',pr:'~1 290€',u:'https://duotonesports.com'},{b:'Armstrong',p:'MA 775 Carbon',pr:'~1 350€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Spitfire 720',pr:'~1 200€',u:'https://axisfoils.com'}]},
+      race:{debutant:[{b:'North',p:'Orbit 4m²',pr:'~950€',u:'https://northkb.com'},{b:'Duotone',p:'Echo 5m²',pr:'~780€',u:'https://duotonesports.com'},{b:'F-One',p:'Strike CWC 4.5m²',pr:'~990€',u:'https://f-one.world'}],intermediaire:[{b:'North',p:'Orbit 3.5m²',pr:'~1 050€',u:'https://northkb.com'},{b:'Duotone',p:'Unit 3.5m²',pr:'~1 100€',u:'https://duotonesports.com'},{b:'Armstrong',p:'MA 925 HA',pr:'~1 280€',u:'https://armstrongfoils.com'}],avance:[{b:'Armstrong',p:'MA 800 HA Race',pr:'~1 400€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Spitfire 800',pr:'~1 200€',u:'https://axisfoils.com'},{b:'Duotone',p:'Unit D/LAB 3m²',pr:'~1 250€',u:'https://duotonesports.com'}],expert:[{b:'Armstrong',p:'MA 675 Carbon',pr:'~1 550€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Spitfire 650',pr:'~1 350€',u:'https://axisfoils.com'},{b:'North',p:'Orbit 2.5m² + mât 95cm',pr:'~1 400€',u:'https://northkb.com'}]},
+      freestyle:{debutant:[{b:'Slingshot',p:'Slingwing V4 5m²',pr:'~820€',u:'https://slingshotsports.com'},{b:'F-One',p:'Swing V3 5m²',pr:'~699€',u:'https://f-one.world'},{b:'Cabrinha',p:'Crosswing X 5m²',pr:'~899€',u:'https://cabrinha.com'}],intermediaire:[{b:'F-One',p:'Strike CWC 4m²',pr:'~950€',u:'https://f-one.world'},{b:'Slingshot',p:'Slingwing 4m²',pr:'~820€',u:'https://slingshotsports.com'},{b:'F-One',p:'Foil Phantom 980',pr:'~980€',u:'https://f-one.world'}],avance:[{b:'F-One',p:'Phantom 980 + fuse 55cm',pr:'~1 050€',u:'https://f-one.world'},{b:'Axis',p:'Art 990 Freestyle',pr:'~1 100€',u:'https://axisfoils.com'},{b:'Slingshot',p:'Hover Glide FW5',pr:'~1 200€',u:'https://slingshotsports.com'}],expert:[{b:'Axis',p:'Art 860 HM',pr:'~1 350€',u:'https://axisfoils.com'},{b:'F-One',p:'Gravity 850',pr:'~1 280€',u:'https://f-one.world'},{b:'Slingshot',p:'Space Skate Pro',pr:'~1 150€',u:'https://slingshotsports.com'}]},
+      surf:{debutant:[{b:'Cabrinha',p:'Crosswing X 5m²',pr:'~899€',u:'https://cabrinha.com'},{b:'F-One',p:'Swing V3 4.5m²',pr:'~699€',u:'https://f-one.world'},{b:'Naish',p:'Matador 5m²',pr:'~750€',u:'https://naishkites.com'}],intermediaire:[{b:'Axis',p:'Art 1150 + board surf',pr:'~1 200€',u:'https://axisfoils.com'},{b:'F-One',p:'Strike CWC 3.5m²',pr:'~960€',u:'https://f-one.world'},{b:'Armstrong',p:'HS1250 surf',pr:'~1 300€',u:'https://armstrongfoils.com'}],avance:[{b:'Armstrong',p:'HS 1050 + mât 80cm',pr:'~1 350€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Spitfire 950 surf',pr:'~1 150€',u:'https://axisfoils.com'},{b:'Cabrinha',p:'Mantis 3m²',pr:'~1 100€',u:'https://cabrinha.com'}],expert:[{b:'Armstrong',p:'HS 850 + board 55L',pr:'~1 500€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Eagle 860 surf',pr:'~1 350€',u:'https://axisfoils.com'},{b:'North',p:'Sonar HA surf',pr:'~1 400€',u:'https://northkb.com'}]},
+      pump:{debutant:[{b:'Naish',p:'Hover Crossover 85L',pr:'~1 400€',u:'https://naishkites.com'},{b:'Slingshot',p:'Hover Glide 78L',pr:'~1 299€',u:'https://slingshotsports.com'},{b:'F-One',p:'Rocket Air Pump',pr:'~1 350€',u:'https://f-one.world'}],intermediaire:[{b:'Armstrong',p:'HS1550 pump',pr:'~1 800€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Spitfire 1099 pump',pr:'~1 650€',u:'https://axisfoils.com'},{b:'Cabrinha',p:'Overdrive Pump 5m²',pr:'~1 500€',u:'https://cabrinha.com'}],avance:[{b:'Armstrong',p:'HA1125 + board 52L',pr:'~2 100€',u:'https://armstrongfoils.com'},{b:'Lift Foils',p:'HA 150 v2',pr:'~2 300€',u:'https://liftfoils.com'},{b:'Axis',p:'Eagle 1099 HM',pr:'~1 900€',u:'https://axisfoils.com'}],expert:[{b:'Lift Foils',p:'HA 120 v2 Carbon',pr:'~2 800€',u:'https://liftfoils.com'},{b:'Armstrong',p:'HA875 Carbon',pr:'~2 600€',u:'https://armstrongfoils.com'},{b:'Code Foil',p:'S-Series 45L',pr:'~3 000€',u:'https://codefoil.com'}]},
+    },
+    supfoil:{
+      downwind:{debutant:[{b:'Starboard',p:'Foil Wedge 10\'5',pr:'~1 999€',u:'https://star-board.com'},{b:'Naish',p:'Hover 110 SUP',pr:'~1 799€',u:'https://naishkites.com'},{b:'Axis',p:'Foil SUP DW 100L',pr:'~1 600€',u:'https://axisfoils.com'}],intermediaire:[{b:'Starboard',p:'Foil Wedge 8\'',pr:'~1 799€',u:'https://star-board.com'},{b:'Armstrong',p:'HS DW 85L',pr:'~1 900€',u:'https://armstrongfoils.com'},{b:'Axis',p:'DW SUP 8\'',pr:'~1 750€',u:'https://axisfoils.com'}],avance:[{b:'Armstrong',p:'HA DW 70L + HA1125',pr:'~2 500€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Eagle DW 65L',pr:'~2 200€',u:'https://axisfoils.com'},{b:'Starboard',p:'Sprint DW 7\'',pr:'~2 100€',u:'https://star-board.com'}],expert:[{b:'Armstrong',p:'HA875 DW Race',pr:'~3 000€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Eagle 860 DW Race',pr:'~2 800€',u:'https://axisfoils.com'},{b:'Code Foil',p:'DW Race 55L',pr:'~3 200€',u:'https://codefoil.com'}]},
+      surf:{debutant:[{b:'Slingshot',p:'Space Skate SUP 8\'',pr:'~1 200€',u:'https://slingshotsports.com'},{b:'Naish',p:'Hover Surf SUP 7\'',pr:'~1 100€',u:'https://naishkites.com'},{b:'Fanatic',p:'Sky SUP 7\'5',pr:'~1 150€',u:'https://fanatic.com'}],intermediaire:[{b:'F-One',p:'Mitu Pro Carbon 6\'',pr:'~1 400€',u:'https://f-one.world'},{b:'Fanatic',p:'Sky Surf 6\'',pr:'~1 250€',u:'https://fanatic.com'},{b:'Axis',p:'Spitfire 1099 SUP surf',pr:'~1 600€',u:'https://axisfoils.com'}],avance:[{b:'Armstrong',p:'HS1250 + SUP 6\'',pr:'~2 000€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Art SUP 5\'5',pr:'~1 500€',u:'https://axisfoils.com'},{b:'North',p:'Sonar SUP surf',pr:'~1 700€',u:'https://northkb.com'}],expert:[{b:'Armstrong',p:'HS975 + race SUP',pr:'~2 500€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Eagle SUP race',pr:'~2 300€',u:'https://axisfoils.com'},{b:'Cabrinha',p:'Foil SUP extreme',pr:'~2 000€',u:'https://cabrinha.com'}]},
+      freeride:{debutant:[{b:'Starboard',p:'Foil Zen 10\'5',pr:'~1 999€',u:'https://star-board.com'},{b:'JP Australia',p:'Foil SUP 10\'',pr:'~1 650€',u:'https://jpaustralia.com'},{b:'Naish',p:'Hover 110',pr:'~1 799€',u:'https://naishkites.com'}],intermediaire:[{b:'Starboard',p:'Foil Wedge 9\'',pr:'~1 850€',u:'https://star-board.com'},{b:'Slingshot',p:'Outwit 8\'',pr:'~1 600€',u:'https://slingshotsports.com'},{b:'F-One',p:'Rocket Air SUP',pr:'~1 850€',u:'https://f-one.world'}],avance:[{b:'Axis',p:'Short SUP 7\'',pr:'~1 400€',u:'https://axisfoils.com'},{b:'Cabrinha',p:'Macro 7\'',pr:'~1 550€',u:'https://cabrinha.com'},{b:'Starboard',p:'Foil Wedge 7\'',pr:'~1 699€',u:'https://star-board.com'}],expert:[{b:'Armstrong',p:'HS DW Race',pr:'~1 900€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Short Race SUP',pr:'~1 700€',u:'https://axisfoils.com'},{b:'Starboard',p:'Sprint Race 6\'',pr:'~2 100€',u:'https://star-board.com'}]},
+    },
+    surfoil:{
+      prone:{debutant:[{b:'Slingshot',p:'Space Skate 6\'5',pr:'~950€',u:'https://slingshotsports.com'},{b:'Cabrinha',p:'Cutlass 6\'5',pr:'~1 050€',u:'https://cabrinha.com'},{b:'Naish',p:'Hover Surf 6\'',pr:'~899€',u:'https://naishkites.com'}],intermediaire:[{b:'Armstrong',p:'HS1250 prone',pr:'~1 400€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Spitfire 1010 prone',pr:'~1 200€',u:'https://axisfoils.com'},{b:'F-One',p:'Mitu Pro Prone 5\'5',pr:'~1 299€',u:'https://f-one.world'}],avance:[{b:'Armstrong',p:'HS1050 + prone board',pr:'~1 600€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Eagle 1099 prone',pr:'~1 450€',u:'https://axisfoils.com'},{b:'North',p:'Sonar Prone 5\'',pr:'~1 500€',u:'https://northkb.com'}],expert:[{b:'Armstrong',p:'HS850 + race prone',pr:'~2 000€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Eagle 860 race prone',pr:'~1 800€',u:'https://axisfoils.com'},{b:'Cabrinha',p:'Extreme Prone',pr:'~1 900€',u:'https://cabrinha.com'}]},
+      surf:{debutant:[{b:'Slingshot',p:'Space Skate 6\'',pr:'~950€',u:'https://slingshotsports.com'},{b:'F-One',p:'Mitu Surf 6\'',pr:'~1 100€',u:'https://f-one.world'},{b:'Fanatic',p:'Sky Surf 6\'',pr:'~1 050€',u:'https://fanatic.com'}],intermediaire:[{b:'F-One',p:'Mitu Pro Carbon 5\'5',pr:'~1 299€',u:'https://f-one.world'},{b:'Armstrong',p:'HS1250 surf board',pr:'~1 500€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Art Pro 5\'',pr:'~1 400€',u:'https://axisfoils.com'}],avance:[{b:'Armstrong',p:'HS1050 + board 5\'',pr:'~1 700€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Art Pro 980 surf',pr:'~1 500€',u:'https://axisfoils.com'},{b:'North',p:'Sonar HS surf',pr:'~1 600€',u:'https://northkb.com'}],expert:[{b:'Armstrong',p:'HS850 performance',pr:'~2 200€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Eagle 860 HM surf',pr:'~2 000€',u:'https://axisfoils.com'},{b:'Cabrinha',p:'Foilboard Extreme',pr:'~1 900€',u:'https://cabrinha.com'}]},
+      tow:{debutant:[{b:'Slingshot',p:'Hover Glide Tow 70L',pr:'~1 100€',u:'https://slingshotsports.com'},{b:'Naish',p:'Hover Tow 65L',pr:'~1 050€',u:'https://naishkites.com'},{b:'Fanatic',p:'Sky Tow 60L',pr:'~1 000€',u:'https://fanatic.com'}],intermediaire:[{b:'Armstrong',p:'HA1250 Tow',pr:'~1 600€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Spitfire Tow 55L',pr:'~1 400€',u:'https://axisfoils.com'},{b:'North',p:'Sonar Tow kit',pr:'~1 500€',u:'https://northkb.com'}],avance:[{b:'Armstrong',p:'HA1000 + Tow board',pr:'~2 000€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Eagle Tow performance',pr:'~1 800€',u:'https://axisfoils.com'},{b:'Cabrinha',p:'Tow Extreme',pr:'~1 700€',u:'https://cabrinha.com'}],expert:[{b:'Armstrong',p:'HA750 race tow',pr:'~2 500€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Eagle 750 HM tow',pr:'~2 300€',u:'https://axisfoils.com'},{b:'Code Foil',p:'Tow S-Series',pr:'~2 800€',u:'https://codefoil.com'}]},
+    },
+    pumpfoil:{
+      flatwater:{debutant:[{b:'Naish',p:'Hover Crossover 85L',pr:'~1 400€',u:'https://naishkites.com'},{b:'Slingshot',p:'Hover Glide 78L',pr:'~1 299€',u:'https://slingshotsports.com'},{b:'Fanatic',p:'Sky Pump 72L',pr:'~1 199€',u:'https://fanatic.com'}],intermediaire:[{b:'Armstrong',p:'HS1550 pump flat',pr:'~1 800€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Spitfire 1099 pump',pr:'~1 650€',u:'https://axisfoils.com'},{b:'Lift Foils',p:'HA 170 Pump',pr:'~1 900€',u:'https://liftfoils.com'}],avance:[{b:'Armstrong',p:'HA1125 + board 50L',pr:'~2 100€',u:'https://armstrongfoils.com'},{b:'Lift Foils',p:'HA 150 v2',pr:'~2 300€',u:'https://liftfoils.com'},{b:'Axis',p:'Eagle 1099 HM pump',pr:'~1 900€',u:'https://axisfoils.com'}],expert:[{b:'Lift Foils',p:'HA 120 v2 Carbon',pr:'~2 800€',u:'https://liftfoils.com'},{b:'Armstrong',p:'HA875 Carbon',pr:'~2 600€',u:'https://armstrongfoils.com'},{b:'Code Foil',p:'S-Series 40L',pr:'~3 200€',u:'https://codefoil.com'}]},
+      downwind:{debutant:[{b:'Starboard',p:'Pump DW 80L',pr:'~1 500€',u:'https://star-board.com'},{b:'Naish',p:'Hover DW 78L',pr:'~1 400€',u:'https://naishkites.com'},{b:'Fanatic',p:'Sky DW 75L',pr:'~1 350€',u:'https://fanatic.com'}],intermediaire:[{b:'Armstrong',p:'HA1125 DW',pr:'~2 000€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Eagle DW pump 65L',pr:'~1 900€',u:'https://axisfoils.com'},{b:'Lift Foils',p:'HA 150 DW',pr:'~2 100€',u:'https://liftfoils.com'}],avance:[{b:'Armstrong',p:'HA925 DW race',pr:'~2 400€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Eagle 860 DW',pr:'~2 200€',u:'https://axisfoils.com'},{b:'Code Foil',p:'DW pump 50L',pr:'~2 800€',u:'https://codefoil.com'}],expert:[{b:'Armstrong',p:'HA750 DW Carbon',pr:'~3 000€',u:'https://armstrongfoils.com'},{b:'Code Foil',p:'S-Series DW',pr:'~3 200€',u:'https://codefoil.com'},{b:'Lift Foils',p:'HA 100 DW race',pr:'~3 100€',u:'https://liftfoils.com'}]},
+      fitness:{debutant:[{b:'Naish',p:'Hover Crossover 85L',pr:'~1 400€',u:'https://naishkites.com'},{b:'Slingshot',p:'Hover Glide 80L',pr:'~1 299€',u:'https://slingshotsports.com'},{b:'Starboard',p:'Pump Fitness 78L',pr:'~1 350€',u:'https://star-board.com'}],intermediaire:[{b:'Armstrong',p:'HS1550 fitness',pr:'~1 800€',u:'https://armstrongfoils.com'},{b:'Axis',p:'Spitfire 1099',pr:'~1 650€',u:'https://axisfoils.com'},{b:'Naish',p:'Hover HA 68L',pr:'~1 700€',u:'https://naishkites.com'}],avance:[{b:'Armstrong',p:'HA1125 fitness',pr:'~2 100€',u:'https://armstrongfoils.com'},{b:'Lift Foils',p:'HA 150 fitness',pr:'~2 300€',u:'https://liftfoils.com'},{b:'Axis',p:'Eagle 1099 fitness',pr:'~1 950€',u:'https://axisfoils.com'}],expert:[{b:'Armstrong',p:'HA875 fitness race',pr:'~2 600€',u:'https://armstrongfoils.com'},{b:'Lift Foils',p:'HA 120 Carbon',pr:'~2 800€',u:'https://liftfoils.com'},{b:'Code Foil',p:'Fitness S-Series',pr:'~3 000€',u:'https://codefoil.com'}]},
+    },
+  };
+  return D[sport]&&D[sport][sub]&&D[sport][sub][niv]?D[sport][sub][niv]:[];
+}
+
+// ===== COMPARATOR =====
+function getComp(sport,sub){
+  const D={
+    wingfoil:{
+      freeride:[{b:'F-One',m:'Strike CWC',r:'850–1 100€',n:4.7,p:'Freeride / Inter–Avancé',badge:'best',u:'https://f-one.world'},{b:'Duotone',m:'Unit D/LAB',r:'1 100–1 350€',n:4.9,p:'Performance / Avancé–Expert',badge:'perf',u:'https://duotonesports.com'},{b:'Cabrinha',m:'Crosswing X',r:'750–950€',n:4.5,p:'Polyvalent / Débutant–Inter',badge:'price',u:'https://cabrinha.com'},{b:'Axis',m:'Foil MA 925',r:'900–1 150€',n:4.7,p:'Freeride polyvalent',badge:'best',u:'https://axisfoils.com'},{b:'Armstrong',m:'MA Series',r:'1 100–1 400€',n:4.8,p:'Performance / Avancé',badge:'perf',u:'https://armstrongfoils.com'}],
+      race:[{b:'Armstrong',m:'MA 800 HA',r:'1 200–1 550€',n:4.9,p:'Race / Avancé–Expert',badge:'perf',u:'https://armstrongfoils.com'},{b:'North',m:'Orbit',r:'950–1 200€',n:4.7,p:'Race / Inter–Expert',badge:'best',u:'https://northkb.com'},{b:'Axis',m:'Spitfire 800',r:'1 000–1 300€',n:4.6,p:'Race / Avancé',badge:'best',u:'https://axisfoils.com'},{b:'Duotone',m:'Unit D/LAB',r:'1 100–1 350€',n:4.8,p:'Race Performance',badge:'perf',u:'https://duotonesports.com'},{b:'Cabrinha',m:'Mantis Race',r:'1 000–1 250€',n:4.5,p:'Race / Inter',badge:'price',u:'https://cabrinha.com'}],
+      freestyle:[{b:'F-One',m:'Phantom 980',r:'900–1 100€',n:4.7,p:'Freestyle / Inter–Avancé',badge:'best',u:'https://f-one.world'},{b:'Axis',m:'Art 990',r:'1 000–1 250€',n:4.8,p:'Freestyle / Avancé',badge:'perf',u:'https://axisfoils.com'},{b:'Slingshot',m:'Hover Glide FW',r:'1 100–1 350€',n:4.6,p:'Freestyle Avancé',badge:'best',u:'https://slingshotsports.com'},{b:'Cabrinha',m:'Crosswing X',r:'750–950€',n:4.4,p:'Freestyle / Débutant–Inter',badge:'price',u:'https://cabrinha.com'},{b:'F-One',m:'Gravity',r:'1 200–1 450€',n:4.9,p:'Freestyle Expert',badge:'perf',u:'https://f-one.world'}],
+      surf:[{b:'Armstrong',m:'HS Series',r:'1 200–1 600€',n:4.9,p:'Surf / Avancé–Expert',badge:'perf',u:'https://armstrongfoils.com'},{b:'Axis',m:'Art Pro',r:'1 000–1 350€',n:4.7,p:'Surf / Inter–Avancé',badge:'best',u:'https://axisfoils.com'},{b:'F-One',m:'Mitu Pro',r:'1 100–1 400€',n:4.6,p:'Surf Polyvalent',badge:'best',u:'https://f-one.world'},{b:'Slingshot',m:'Space Skate',r:'850–1 100€',n:4.4,p:'Surf / Débutant–Inter',badge:'price',u:'https://slingshotsports.com'},{b:'North',m:'Sonar HA',r:'1 300–1 600€',n:4.8,p:'Surf / Expert',badge:'perf',u:'https://northkb.com'}],
+      pump:[{b:'Armstrong',m:'HA Series',r:'1 800–2 700€',n:4.9,p:'Pump / Inter–Expert',badge:'perf',u:'https://armstrongfoils.com'},{b:'Lift Foils',m:'HA v2',r:'2 300–2 900€',n:4.8,p:'Pump / Expert distance',badge:'perf',u:'https://liftfoils.com'},{b:'Axis',m:'Eagle HM',r:'1 600–2 200€',n:4.7,p:'Pump / Avancé',badge:'best',u:'https://axisfoils.com'},{b:'Naish',m:'Hover Crossover',r:'1 200–1 600€',n:4.4,p:'Pump / Débutant',badge:'price',u:'https://naishkites.com'},{b:'Slingshot',m:'Hover Glide',r:'1 100–1 500€',n:4.3,p:'Pump / Débutant–Inter',badge:'price',u:'https://slingshotsports.com'}],
+    },
+    supfoil:{
+      downwind:[{b:'Armstrong',m:'HA Series DW',r:'2 000–3 000€',n:4.9,p:'Race DW / Expert',badge:'perf',u:'https://armstrongfoils.com'},{b:'Starboard',m:'Foil Wedge DW',r:'1 700–2 200€',n:4.7,p:'DW / All levels',badge:'best',u:'https://star-board.com'},{b:'Axis',m:'Eagle DW',r:'1 800–2 500€',n:4.8,p:'DW / Avancé–Expert',badge:'best',u:'https://axisfoils.com'},{b:'Naish',m:'Hover DW',r:'1 400–1 900€',n:4.5,p:'DW / Débutant–Inter',badge:'price',u:'https://naishkites.com'},{b:'Code Foil',m:'DW Race',r:'2 800–3 500€',n:4.9,p:'DW / Elite race',badge:'perf',u:'https://codefoil.com'}],
+      surf:[{b:'Armstrong',m:'HS SUP Surf',r:'1 800–2 500€',n:4.9,p:'Surf / Avancé–Expert',badge:'perf',u:'https://armstrongfoils.com'},{b:'Axis',m:'Spitfire SUP',r:'1 400–1 900€',n:4.7,p:'Surf / Inter–Avancé',badge:'best',u:'https://axisfoils.com'},{b:'Slingshot',m:'Space Skate SUP',r:'1 100–1 400€',n:4.4,p:'Surf / Débutant',badge:'price',u:'https://slingshotsports.com'},{b:'F-One',m:'Mitu SUP',r:'1 300–1 700€',n:4.6,p:'Surf Polyvalent',badge:'best',u:'https://f-one.world'},{b:'Fanatic',m:'Sky Surf SUP',r:'1 100–1 500€',n:4.4,p:'Surf / Débutant–Inter',badge:'price',u:'https://fanatic.com'}],
+      freeride:[{b:'Starboard',m:'Foil Zen / Wedge',r:'1 700–2 100€',n:4.8,p:'Freeride / All levels',badge:'best',u:'https://star-board.com'},{b:'Naish',m:'Hover Crossover',r:'1 400–1 800€',n:4.5,p:'Freeride / Débutant–Inter',badge:'price',u:'https://naishkites.com'},{b:'JP Australia',m:'Foil SUP',r:'1 400–1 800€',n:4.4,p:'Freeride / Débutant',badge:'price',u:'https://jpaustralia.com'},{b:'F-One',m:'Rocket Air SUP',r:'1 700–2 000€',n:4.6,p:'Freeride gonflable',badge:'best',u:'https://f-one.world'},{b:'Fanatic',m:'Sky SUP',r:'1 200–1 600€',n:4.5,p:'Freeride / Débutant',badge:'price',u:'https://fanatic.com'}],
+    },
+    surfoil:{
+      prone:[{b:'Armstrong',m:'HS Prone Series',r:'1 800–2 500€',n:4.9,p:'Prone / Avancé–Expert',badge:'perf',u:'https://armstrongfoils.com'},{b:'Axis',m:'Spitfire Prone',r:'1 300–1 800€',n:4.7,p:'Prone / Inter–Avancé',badge:'best',u:'https://axisfoils.com'},{b:'Slingshot',m:'Space Skate',r:'950–1 200€',n:4.4,p:'Prone / Débutant',badge:'price',u:'https://slingshotsports.com'},{b:'F-One',m:'Mitu Pro Prone',r:'1 200–1 600€',n:4.6,p:'Prone Polyvalent',badge:'best',u:'https://f-one.world'},{b:'Cabrinha',m:'Cutlass Prone',r:'1 000–1 300€',n:4.4,p:'Prone / Débutant–Inter',badge:'price',u:'https://cabrinha.com'}],
+      surf:[{b:'Armstrong',m:'HS Surf',r:'1 800–2 500€',n:4.9,p:'Surf / Avancé–Expert',badge:'perf',u:'https://armstrongfoils.com'},{b:'Axis',m:'Art Pro Surf',r:'1 300–1 750€',n:4.7,p:'Surf / Inter–Avancé',badge:'best',u:'https://axisfoils.com'},{b:'Slingshot',m:'Space Skate Surf',r:'950–1 200€',n:4.4,p:'Surf / Débutant',badge:'price',u:'https://slingshotsports.com'},{b:'F-One',m:'Mitu Pro Surf',r:'1 200–1 600€',n:4.6,p:'Surf Polyvalent',badge:'best',u:'https://f-one.world'},{b:'North',m:'Sonar Surf',r:'1 400–1 800€',n:4.8,p:'Surf / Avancé–Expert',badge:'perf',u:'https://northkb.com'}],
+      tow:[{b:'Armstrong',m:'HA Tow',r:'2 000–2 800€',n:4.9,p:'Tow / Avancé–Expert',badge:'perf',u:'https://armstrongfoils.com'},{b:'Axis',m:'Eagle Tow',r:'1 800–2 400€',n:4.7,p:'Tow / Inter–Expert',badge:'best',u:'https://axisfoils.com'},{b:'Slingshot',m:'Hover Tow',r:'1 100–1 500€',n:4.4,p:'Tow / Débutant–Inter',badge:'price',u:'https://slingshotsports.com'},{b:'North',m:'Sonar Tow',r:'1 500–2 000€',n:4.6,p:'Tow / Inter–Avancé',badge:'best',u:'https://northkb.com'},{b:'Code Foil',m:'Tow S-Series',r:'2 500–3 200€',n:4.9,p:'Tow Elite',badge:'perf',u:'https://codefoil.com'}],
+    },
+    pumpfoil:{
+      flatwater:[{b:'Lift Foils',m:'HA v2 Carbon',r:'2 500–3 000€',n:4.9,p:'Flat / Expert distance',badge:'perf',u:'https://liftfoils.com'},{b:'Armstrong',m:'HA Series flat',r:'1 800–2 700€',n:4.8,p:'Flat / Inter–Expert',badge:'best',u:'https://armstrongfoils.com'},{b:'Axis',m:'Eagle HM flat',r:'1 600–2 200€',n:4.7,p:'Flat / Avancé',badge:'best',u:'https://axisfoils.com'},{b:'Naish',m:'Hover Crossover',r:'1 200–1 600€',n:4.4,p:'Flat / Débutant',badge:'price',u:'https://naishkites.com'},{b:'Slingshot',m:'Hover Glide flat',r:'1 100–1 500€',n:4.3,p:'Flat / Débutant–Inter',badge:'price',u:'https://slingshotsports.com'}],
+      downwind:[{b:'Armstrong',m:'HA DW Race',r:'2 400–3 200€',n:4.9,p:'DW pump / Expert',badge:'perf',u:'https://armstrongfoils.com'},{b:'Lift Foils',m:'HA 150 DW',r:'2 200–2 800€',n:4.8,p:'DW pump / Avancé–Expert',badge:'perf',u:'https://liftfoils.com'},{b:'Axis',m:'Eagle DW pump',r:'1 900–2 500€',n:4.7,p:'DW pump / Inter–Avancé',badge:'best',u:'https://axisfoils.com'},{b:'Starboard',m:'Pump DW',r:'1 500–2 000€',n:4.5,p:'DW pump / Débutant–Inter',badge:'price',u:'https://star-board.com'},{b:'Code Foil',m:'DW S-Series',r:'2 800–3 500€',n:4.9,p:'DW pump / Elite',badge:'perf',u:'https://codefoil.com'}],
+      fitness:[{b:'Armstrong',m:'HA Fitness',r:'1 800–2 500€',n:4.8,p:'Fitness / Inter–Expert',badge:'best',u:'https://armstrongfoils.com'},{b:'Lift Foils',m:'HA Fitness',r:'2 000–2 600€',n:4.7,p:'Fitness / Avancé',badge:'perf',u:'https://liftfoils.com'},{b:'Naish',m:'Hover Fitness',r:'1 200–1 600€',n:4.4,p:'Fitness / Débutant',badge:'price',u:'https://naishkites.com'},{b:'Axis',m:'Spitfire fitness',r:'1 500–2 000€',n:4.6,p:'Fitness / Inter',badge:'best',u:'https://axisfoils.com'},{b:'Slingshot',m:'Hover Glide fit',r:'1 100–1 500€',n:4.3,p:'Fitness / Débutant',badge:'price',u:'https://slingshotsports.com'}],
+    },
+  };
+  return D[sport]&&D[sport][sub]?D[sport][sub]:[];
+}
+
+// ===== RENDER =====
+function showResults(){
+  if(!S.niveau){document.getElementById('err4').classList.add('show');return;}
+  document.getElementById('err4').classList.remove('show');
+  const imc=(S.poids/Math.pow(S.taille/100,2)).toFixed(1);
+  const nlbl={debutant:t('ld'),intermediaire:t('li'),avance:t('la'),expert:t('le')};
+  document.getElementById('rider-sum').innerHTML=`
+    <div class="rs"><div class="rs-val">${S.poids} kg</div><div class="rs-lbl">${t('sp')}</div></div>
+    <div class="rs"><div class="rs-val">${S.taille} cm</div><div class="rs-lbl">${t('st')}</div></div>
+    <div class="rs"><div class="rs-val">${imc}</div><div class="rs-lbl">${t('si')}</div></div>
+    <div class="rs"><div class="rs-val">${nlbl[S.niveau]}</div><div class="rs-lbl">${t('sn')}</div></div>`;
+
+  const calcMap={wingfoil:calcWingfoil,supfoil:calcSupfoil,surfoil:calcSurfoil,pumpfoil:calcPumpfoil};
+  let html='';
+  S.disciplines.forEach(disc=>{
+    const sub=S.subdiscs[disc];
+    const res=calcMap[disc](sub);
+    html+=`<div class="result-block">
+      <div class="result-block-header">
+        <span class="rbh-icon">${res.icon}</span>
+        <span class="rbh-title">${res.title}</span>
+        <span class="rbh-sub">${res.subdiscLabel}</span>
+      </div>
+      <div class="result-block-body">
+        <div class="subdisc-tag">● ${res.subdiscLabel}</div>
+        <div class="equip-grid">`;
+    res.items.forEach(it=>{
+      html+=`<div class="equip-item"><div class="eq-lbl">${it.l}</div><div class="eq-val">${it.v}</div><div class="eq-detail">${it.d}</div><div class="rbar-track"><div class="rbar-fill" style="width:0%" data-pct="${it.p}"></div></div></div>`;
+    });
+    html+=`</div>`;
+    if(res.tips.length){
+      html+=`<div class="tips-wrap">`;
+      res.tips.forEach(tip=>{html+=`<div class="tip-box">${tip}</div>`;});
+      html+=`</div>`;
+    }
+    // Affiliates
+    if(res.aff.length){
+      html+=`<div class="aff-wrap"><div class="aff-title">${t('at')}</div><div class="aff-grid">`;
+      res.aff.forEach(a=>{html+=`<a class="aff-card" href="${a.u}" target="_blank" rel="noopener noreferrer"><div class="aff-brand">${a.b}</div><div class="aff-product">${a.p}</div><div class="aff-price">${a.pr}</div><span class="aff-cta">${t('acta')}</span></a>`;});
+      html+=`</div><div class="aff-disclaimer">${t('adis')}</div></div>`;
+    }
+    // Comparator
+    if(res.comp.length){
+      const bmap={best:'b-best',price:'b-price',perf:'b-perf'};
+      const blbl={best:t('bb2'),price:t('bp2'),perf:t('bpe')};
+      html+=`<div class="comp-wrap"><div class="comp-title">${t('ct')} — ${res.title}</div><div class="comp-scroll"><table class="comp-table"><thead><tr><th>${t('cb')}</th><th>${t('cm')}</th><th>${t('cr')}</th><th>${t('cno')}</th><th>${t('cp')}</th><th></th></tr></thead><tbody>`;
+      res.comp.forEach(row=>{
+        const stars='★'.repeat(Math.floor(row.n))+'☆'.repeat(5-Math.floor(row.n));
+        html+=`<tr><td><strong>${row.b}</strong></td><td>${row.m} <span class="badge ${bmap[row.badge]}">${blbl[row.badge]}</span></td><td style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--gold)">${row.r}</td><td><span class="star-r">${stars}</span> <small style="color:var(--mist)">${row.n}</small></td><td style="color:var(--mist);font-size:.75rem">${row.p}</td><td><a class="c-link" href="${row.u}" target="_blank" rel="noopener noreferrer">${t('cv')} →</a></td></tr>`;
+      });
+      html+=`</tbody></table></div></div>`;
+    }
+    html+=`</div></div>`;
+  });
+  document.getElementById('results-content').innerHTML=html;
+  setActive('result');
+  setTimeout(()=>{document.querySelectorAll('.rbar-fill').forEach(b=>{b.style.width=b.dataset.pct+'%';});},120);
+}
+
+function restart(){
+  S={poids:0,taille:0,pointure:0,envergure:0,disciplines:[],subdiscs:{},niveau:''};
+  ['poids','taille','pointure','envergure'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('.disc-card,.level-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.step-dot').forEach(d=>d.classList.remove('active','completed'));
+  setActive(1);
+}
+
+// Init lang
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===lang.toUpperCase()));
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const v=TR[lang][el.dataset.i18n];if(v)el.textContent=v;});
+});
+</script>
+</body>
+</html>
